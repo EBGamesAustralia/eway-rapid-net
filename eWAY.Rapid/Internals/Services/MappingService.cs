@@ -102,7 +102,14 @@ namespace eWAY.Rapid.Internals.Services
             //Errors
             Mapper.CreateMap<BaseResponse, Rapid.Models.BaseResponse>()
                 .ForMember(dest => dest.Errors,
-                   opt => opt.ResolveUsing(s => !string.IsNullOrWhiteSpace(s.Errors) ? s.Errors.Split(',').ToList() : null));
+                    opt => opt.MapFrom(s => !string.IsNullOrWhiteSpace(s.Errors) ? s.Errors.Split(',').ToList() : null))
+                .AfterMap((x, y) =>
+                {
+                    if (string.IsNullOrEmpty(x.Errors))
+                    {
+                        y.Errors = null;
+                    }
+                });
 
             Mapper.CreateMap<DirectPaymentResponse, CreateTransactionResponse>()
                 .IncludeBase<BaseResponse, Rapid.Models.BaseResponse>()
@@ -333,6 +340,7 @@ namespace eWAY.Rapid.Internals.Services
             Mapper.CreateMap<PaymentDetails, Payment>().ReverseMap();
             Mapper.CreateMap<CardDetails, Models.CardDetails>().ReverseMap();
             Mapper.CreateMap<VerificationResult, Verification>().ReverseMap();
+            Mapper.CreateMap<Models.VerificationResult, Verification>().ReverseMap();
             Mapper.CreateMap<VerificationResult, Models.VerificationResult>().ReverseMap();
             Mapper.CreateMap<Rapid.Models.Payment, Payment>().ReverseMap();
             Mapper.CreateMap<Rapid.Models.SettlementSummary, Models.SettlementSummary>().ReverseMap();
